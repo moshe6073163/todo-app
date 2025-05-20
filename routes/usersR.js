@@ -13,7 +13,7 @@ const {
 const { checkLogin } = require('../middleware/user');
 
 router.post('/getAllUsers', checkLogin, getAllUsers);
-router.post('/signUp', signUp);
+router.post('/signUp', signUp); 
 router.post('/getUserByEmail', checkLogin, getUserByEmail);
 router.put('/updateUser', checkLogin, updateUser);
 router.put('/updateOtherUser', checkLogin, updateOtherUser);
