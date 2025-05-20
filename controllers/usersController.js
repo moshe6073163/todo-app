@@ -9,8 +9,7 @@ exports.getAllUsers = async (req, res, next) => {
   try {
     const { token } = req.body;
     if (!token) return res.status(400).json({ message: 'Missing token' });
-    const currUser = await verifyToken(token);
-    if (!currUser || currUser.role !== "admin") return res.status(401).json({ message: 'Invalid credentials' });
+    if (!req.user || req.user.role !== "admin") return res.status(401).json({ message: 'Invalid credentials' });
     const users = await userModel.find({}, { profile: 1, email: 1, role: 1 });
     res.status(200).json(users);
   } catch (err) {
@@ -22,8 +21,7 @@ exports.getUserByEmail = async (req, res, next) => {
   try {
     const { email, token } = req.body;
     if (!email, !token) return res.status(400).json({ message: 'Missing email' });
-    const currUser = await verifyToken(token);
-    if (!currUser || currUser.role !== "admin") return res.status(401).json({ message: 'Invalid credentials' });
+    if (!req.user || req.user.role !== "admin") return res.status(401).json({ message: 'Invalid credentials' });
     const user = await userModel.findOne({ email }, { profile: 1, email: 1, role: 1 });
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
@@ -67,9 +65,8 @@ exports.updateUser = async (req, res, next) => {
   try {
     const { profile, token } = req.body;
     if (!profile || !token) return res.status(400).json({ message: 'Missing fields' });
-    const currUser = await verifyToken(token);
-    if (!currUser) return res.status(401).json({ message: 'Invalid credentials' });
-    await userModel.updateOne({ email: currUser.email }, { $set: { profile: profile, } });
+    if (!req.user || !req.user) return res.status(401).json({ message: 'Invalid credentials' });
+    await userModel.updateOne({ email: req.user.email }, { $set: { profile: profile, } });
     res.status(200).json({ success: true });
   } catch (err) {
     next(err);
@@ -81,8 +78,7 @@ exports.updateOtherUser = async (req, res, next) => {
   try {
     const { profile, email, token } = req.body;
     if (!profile || !email || !token) return res.status(400).json({ message: 'Missing fields' });
-    const currUser = verifyToken(token);
-    if (!currUser || currUser.role !== "admin") return res.status(401).json({ message: 'Invalid credentials' });
+    if (!req.user || req.user.role !== "admin") return res.status(401).json({ message: 'Invalid credentials' });
     const targetUser = await userModel.findOne({ email });
     if (!targetUser) return res.status(404).json({ message: 'User not found' });
     await userModel.updateOne({ email: targetUser.email }, { $set: { profile: profile, } });
@@ -97,9 +93,8 @@ exports.deleteUser = async (req, res, next) => {
   try {
     const { token } = req.body;
     if (!token) return res.status(400).json({ message: 'Missing fields' });
-    const currUser = verifyToken(token);
-    if (!currUser) return res.status(404).json({ message: 'User not found' });
-    await userModel.deleteOne({ email });
+    if (!req.user || req.user.role !== "user") return res.status(404).json({ message: 'User not found' });
+    await userModel.deleteOne({ _id: req.user._id });
     res.status(200).json({ success: true });
   } catch (err) {
     next(err);
@@ -111,8 +106,7 @@ exports.deleteOtherUser = async (req, res, next) => {
   try {
     const { email, token } = req.body;
     if (!email || !token) return res.status(400).json({ message: 'Missing fields' });
-    const currUser = verifyToken(token);
-    if (!currUser || currUser.role !== "admin") return res.status(401).json({ message: 'Invalid credentials' });
+    if (!req.user || req.user.role !== "admin") return res.status(401).json({ message: 'Invalid credentials' });
     const targetUser = await userModel.findOne({ email });
     if (!targetUser) return res.status(404).json({ message: 'User not found' });
     await userModel.deleteOne({ email: targetUser.email });

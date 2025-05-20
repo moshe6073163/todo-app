@@ -4,11 +4,12 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "30d";
 
 
 const generateToken = (user) => {
-    if(!user || !user.id || !user.email || !user.role) {
+    if(!user || !user.id|| !user._id || !user.email || !user.role) {
         throw new Error("Invalid user object");
     }
     const payload = {
         id: user.id,
+        _id: user._id,
         email: user.email,
         role: user.role,
     }

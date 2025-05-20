@@ -6,15 +6,19 @@ const {
   signUp,
   updateUser,
   deleteUser,
-  signIn
+  signIn,
+  updateOtherUser,
+  deleteOtherUser
 } = require('../controllers/usersController');
-const { checkAccess } = require('../middleware/user');
+const { checkLogin } = require('../middleware/user');
 
-router.post('/getAllUsers', checkAccess, getAllUsers);
+router.post('/getAllUsers', checkLogin, getAllUsers);
 router.post('/signUp', signUp);
-router.post('/getUserByEmail', getUserByEmail);
-router.put('/updateUser', updateUser);
-router.delete('/deleteUser', deleteUser);
+router.post('/getUserByEmail', checkLogin, getUserByEmail);
+router.put('/updateUser', checkLogin, updateUser);
+router.put('/updateOtherUser', checkLogin, updateOtherUser);
+router.delete('/deleteUser', checkLogin, deleteUser);
+router.delete('/deleteOtherUser', checkLogin, deleteOtherUser);
 router.post('/signIn', signIn);
 
 module.exports = router;

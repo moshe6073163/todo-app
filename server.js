@@ -5,7 +5,13 @@ const configRoutes = require('./routes/configRoutes');
 const mongoose = require("mongoose");
 require('dotenv').config();
 const mongoURL = process.env.MONGO_URL;
+const cors = require('cors');
 
+app.use(cors({
+    origin: ['http://localhost:3000', "https://prod.example.com"],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 app.use(logger);
